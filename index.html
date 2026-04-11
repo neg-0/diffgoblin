@@ -523,8 +523,7 @@
   </footer>
 
   <script>
-    // Simple email collection — stores to localStorage for now,
-    // will wire to a real backend before launch
+    const FORMSUBMIT_URL = 'https://formsubmit.co/ajax/dustin@shipgoblin.com';
     const forms = document.querySelectorAll('form');
     const successEl = document.getElementById('form-success');
 
@@ -532,19 +531,31 @@
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = form.querySelector('input[name="email"]').value;
+        const btn = form.querySelector('button');
+        btn.textContent = 'Joining...';
+        btn.disabled = true;
 
-        // Store locally
-        const emails = JSON.parse(localStorage.getItem('diffgoblin_waitlist') || '[]');
-        if (!emails.includes(email)) {
-          emails.push(email);
-          localStorage.setItem('diffgoblin_waitlist', JSON.stringify(emails));
+        try {
+          const res = await fetch(FORMSUBMIT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              _subject: 'DiffGoblin waitlist signup',
+              _template: 'table'
+            })
+          });
+
+          if (!res.ok) throw new Error('Submit failed');
+        } catch {
+          // Fallback: store locally so we don't lose the signup
+          const emails = JSON.parse(localStorage.getItem('diffgoblin_waitlist') || '[]');
+          if (!emails.includes(email)) {
+            emails.push(email);
+            localStorage.setItem('diffgoblin_waitlist', JSON.stringify(emails));
+          }
         }
 
-        // Log for visibility
-        console.log('Waitlist signup:', email);
-        console.log('Total signups:', emails.length);
-
-        // Show success
         if (form.id === 'signup-form') {
           form.style.display = 'none';
           document.querySelector('.form-note').style.display = 'none';
