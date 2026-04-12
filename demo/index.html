@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiffGoblin Live Demo — Real-Time SaaS Pricing Monitoring</title>
+  <meta name="description" content="See DiffGoblin in action. We're monitoring pricing pages from Figma, Linear, Vercel, Notion, and Stripe right now. Here's what we're watching.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green: #10b981;
+      --green-dark: #059669;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #262626;
+      --text: #fafafa;
+      --text-muted: #a3a3a3;
+      --text-dim: #737373;
+      --orange: #f59e0b;
+      --blue: #3b82f6;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--green);
+      text-decoration: none;
+    }
+    .logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--green) !important;
+      color: #000 !important;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: var(--green-dark) !important; }
+
+    .hero {
+      padding: 60px 0 40px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    h1 em { font-style: normal; color: var(--green); }
+    .hero p {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .dashboard {
+      padding: 40px 0 80px;
+    }
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dash-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .dash-meta {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .monitor-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .monitor-card:hover { border-color: #444; }
+    .monitor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .monitor-url {
+      font-size: 15px;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .monitor-url a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    .monitor-url a:hover { color: var(--green); }
+    .badge {
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .badge-watching { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+    .badge-baseline { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+    .badge-changed { background: rgba(245, 158, 11, 0.15); color: var(--orange); }
+
+    .monitor-details {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .monitor-detail {
+      font-size: 13px;
+    }
+    .monitor-detail .label {
+      color: var(--text-dim);
+      margin-right: 4px;
+    }
+    .monitor-detail .value {
+      color: var(--text-muted);
+    }
+
+    .monitor-what {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .monitor-what strong { color: var(--text); font-weight: 600; }
+
+    .report-preview {
+      margin-top: 48px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+    }
+    .report-preview h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .report-preview > p {
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      font-size: 16px;
+    }
+
+    .email-preview {
+      background: #1a1a2a;
+      border: 1px solid #2a2a3a;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .email-header {
+      padding: 20px 24px;
+      background: #12121f;
+      border-bottom: 1px solid #2a2a3a;
+    }
+    .email-from {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .email-from strong { color: var(--text-muted); }
+    .email-subject {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+    .email-body {
+      padding: 24px;
+    }
+    .email-summary {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .email-summary h3 {
+      font-size: 14px;
+      color: var(--green);
+      margin-bottom: 8px;
+    }
+    .email-summary p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .email-change-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .email-change-item h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .email-change-item p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .diff-visual {
+      display: flex;
+      gap: 2px;
+      margin-top: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 8px;
+    }
+    .diff-bar { height: 100%; }
+    .diff-unchanged { background: #1a3a2a; flex: 94; }
+    .diff-changed { background: var(--orange); flex: 6; }
+
+    .cta-section {
+      padding: 80px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .cta-section h2 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .cta-section p {
+      color: var(--text-muted);
+      font-size: 18px;
+      margin-bottom: 32px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      padding: 14px 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    .cta-btn:hover { background: var(--green-dark); }
+
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    @media (max-width: 640px) {
+      .monitor-details { gap: 12px; }
+      .dash-header { flex-direction: column; gap: 8px; }
+      .email-preview { margin: 0 -12px; border-radius: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container">
+      <a href="../" class="logo">diff<span>goblin</span></a>
+      <div class="nav-links">
+        <a href="../blog/saas-pricing-changes-2025.html">Blog</a>
+        <a href="../#waitlist" class="nav-cta">Join Waitlist</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge"><span class="pulse"></span> Live monitoring active</div>
+      <h1>We're watching <em>5 SaaS pricing pages</em> right now</h1>
+      <p>This is a real DiffGoblin monitoring dashboard. These pages are screenshotted daily. When something changes, we'll know.</p>
+    </div>
+  </section>
+
+  <section class="dashboard">
+    <div class="container">
+      <div class="dash-header">
+        <h2>Monitored Pages</h2>
+        <div class="dash-meta">Last scan: <span id="last-scan">April 12, 2026</span> &middot; Next scan in ~24h</div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-header">
+          <div class="monitor-url"><a href="https://www.figma.com/pricing" target="_blank" rel="noopener">figma.com/pricing</a></div>
+          <span class="badge badge-watching">Watching</span>
+        </div>
+        <div class="monitor-details">
+          <div class="monitor-detail"><span class="label">Scans:</span><span class="value">1</span></div>
+          <div class="monitor-detail"><span class="label">Changes detected:</span><span class="value">0</span></div>
+          <div class="monitor-detail"><span class="label">Tracking since:</span><span class="value">Apr 12</span></div>
+        </div>
+        <div class="monitor-what">
+          <strong>Why we watch:</strong> Figma rebuilt their entire pricing architecture in 2025 — from per-product billing to role-based seat tiers. They're still iterating. <a href="../blog/saas-pricing-changes-2025.html" style="color: var(--green);">Read our teardown &rarr;</a>
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-header">
+          <div class="monitor-url"><a href="https://linear.app/pricing" target="_blank" rel="noopener">linear.app/pricing</a></div>
+          <span class="badge badge-watching">Watching</span>
+        </div>
+        <div class="monitor-details">
+          <div class="monitor-detail"><span class="label">Scans:</span><span class="value">1</span></div>
+          <div class="monitor-detail"><span class="label">Changes detected:</span><span class="value">0</span></div>
+          <div class="monitor-detail"><span class="label">Tracking since:</span><span class="value">Apr 12</span></div>
+        </div>
+        <div class="monitor-what">
+          <strong>Why we watch:</strong> Linear has been quietly expanding their free tier and adding enterprise features. One of the fastest-moving project management tools in pricing terms.
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-header">
+          <div class="monitor-url"><a href="https://vercel.com/pricing" target="_blank" rel="noopener">vercel.com/pricing</a></div>
+          <span class="badge badge-watching">Watching</span>
+        </div>
+        <div class="monitor-details">
+          <div class="monitor-detail"><span class="label">Scans:</span><span class="value">1</span></div>
+          <div class="monitor-detail"><span class="label">Changes detected:</span><span class="value">0</span></div>
+          <div class="monitor-detail"><span class="label">Tracking since:</span><span class="value">Apr 12</span></div>
+        </div>
+        <div class="monitor-what">
+          <strong>Why we watch:</strong> Vercel's pricing has been contentious in the dev community. Usage-based billing means the numbers on this page directly affect what developers pay.
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-header">
+          <div class="monitor-url"><a href="https://www.notion.so/pricing" target="_blank" rel="noopener">notion.so/pricing</a></div>
+          <span class="badge badge-watching">Watching</span>
+        </div>
+        <div class="monitor-details">
+          <div class="monitor-detail"><span class="label">Scans:</span><span class="value">1</span></div>
+          <div class="monitor-detail"><span class="label">Changes detected:</span><span class="value">0</span></div>
+          <div class="monitor-detail"><span class="label">Tracking since:</span><span class="value">Apr 12</span></div>
+        </div>
+        <div class="monitor-what">
+          <strong>Why we watch:</strong> Notion has been adding AI features to every tier and adjusting what's included. The workspace-based model means pricing changes ripple through entire organizations.
+        </div>
+      </div>
+
+      <div class="monitor-card">
+        <div class="monitor-header">
+          <div class="monitor-url"><a href="https://stripe.com/pricing" target="_blank" rel="noopener">stripe.com/pricing</a></div>
+          <span class="badge badge-watching">Watching</span>
+        </div>
+        <div class="monitor-details">
+          <div class="monitor-detail"><span class="label">Scans:</span><span class="value">1</span></div>
+          <div class="monitor-detail"><span class="label">Changes detected:</span><span class="value">0</span></div>
+          <div class="monitor-detail"><span class="label">Tracking since:</span><span class="value">Apr 12</span></div>
+        </div>
+        <div class="monitor-what">
+          <strong>Why we watch:</strong> Stripe's transaction fees directly impact every SaaS company's unit economics. Even a 0.1% change shifts millions in aggregate developer spend.
+        </div>
+      </div>
+
+      <div class="report-preview">
+        <h2>What you'd get when something changes</h2>
+        <p>Here's a preview of a real DiffGoblin alert email. When we detect a change, you get this in your inbox.</p>
+
+        <div class="email-preview">
+          <div class="email-header">
+            <div class="email-from">From: <strong>DiffGoblin</strong> &lt;alerts@diffgoblin.com&gt;</div>
+            <div class="email-subject">Change detected: figma.com/pricing</div>
+          </div>
+          <div class="email-body">
+            <div class="email-summary">
+              <h3>AI Summary</h3>
+              <p>Figma updated their pricing page: the Pro plan increased from $12/editor/mo to $15/editor/mo (25% increase). The "FigJam" standalone pricing was removed entirely, replaced with a note that FigJam is now included in all paid plans. Enterprise pricing now shows "Contact sales" instead of $75/editor/mo.</p>
+            </div>
+
+            <div class="email-change-item">
+              <h4>Visual change: 6.2% of page pixels changed</h4>
+              <p>Pricing cards, tier names, and CTA buttons all modified. Header and footer unchanged.</p>
+              <div class="diff-visual">
+                <div class="diff-bar diff-unchanged"></div>
+                <div class="diff-bar diff-changed"></div>
+              </div>
+            </div>
+
+            <div class="email-change-item">
+              <h4>Key changes detected</h4>
+              <p>&bull; Pro plan price: $12/mo &rarr; $15/mo<br>
+                 &bull; FigJam standalone: Removed<br>
+                 &bull; Enterprise: Listed price &rarr; "Contact sales"<br>
+                 &bull; New badge: "AI included" on Professional tier</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <h2>Want this for your competitors?</h2>
+      <p>Add any URL. Get daily screenshots, visual diffs, and AI summaries. Never manually check a page again.</p>
+      <a href="../#waitlist" class="cta-btn">Get Early Access</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>DiffGoblin by ShipGoblin &mdash; a Negative Zero Inc. experiment</p>
+    </div>
+  </footer>
+</body>
+</html>
