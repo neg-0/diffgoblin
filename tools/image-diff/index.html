@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Screenshot Diff Tool — Compare Two Images Visually | DiffGoblin</title>
+  <meta name="description" content="Upload two screenshots and instantly see what changed. Free visual diff tool — highlights pixel differences, no signup required. By DiffGoblin.">
+  <meta name="keywords" content="image diff tool, screenshot comparison, visual diff, compare screenshots, image comparison tool, pixel diff">
+  <link rel="canonical" href="https://neg-0.github.io/diffgoblin/tools/image-diff/">
+  <meta property="og:title" content="Free Screenshot Diff Tool — Compare Two Images">
+  <meta property="og:description" content="Upload two screenshots and instantly see what changed. Highlights pixel differences. No signup required.">
+  <meta property="og:type" content="website">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green: #10b981;
+      --green-dark: #059669;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #262626;
+      --text: #fafafa;
+      --text-muted: #a3a3a3;
+      --text-dim: #737373;
+      --red: #ef4444;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 20px; font-weight: 700; color: var(--green); text-decoration: none; }
+    .logo span { color: var(--text); }
+    .nav-cta {
+      background: var(--green); color: #000; padding: 8px 20px; border-radius: 6px;
+      text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--green-dark); }
+
+    .hero { padding: 60px 0 40px; text-align: center; }
+    .hero-badge {
+      display: inline-block; background: rgba(16,185,129,0.1); color: var(--green);
+      padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 600;
+      margin-bottom: 20px; border: 1px solid rgba(16,185,129,0.2);
+    }
+    h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.02em; }
+    h1 em { font-style: normal; color: var(--green); }
+    .hero p { font-size: 18px; color: var(--text-muted); max-width: 560px; margin: 0 auto; }
+
+    .tool-area { padding: 40px 0 80px; }
+
+    .drop-zones {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;
+    }
+    @media (max-width: 640px) { .drop-zones { grid-template-columns: 1fr; } }
+
+    .drop-zone {
+      background: var(--surface); border: 2px dashed var(--border); border-radius: 12px;
+      padding: 40px 24px; text-align: center; cursor: pointer; transition: border-color 0.2s;
+      position: relative; min-height: 200px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--green); }
+    .drop-zone.has-image { padding: 12px; border-style: solid; }
+    .drop-zone h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .drop-zone p { font-size: 13px; color: var(--text-dim); }
+    .drop-zone img {
+      max-width: 100%; max-height: 400px; border-radius: 8px; object-fit: contain;
+    }
+    .drop-zone input { display: none; }
+    .drop-zone .label-tag {
+      position: absolute; top: 12px; left: 12px; background: rgba(16,185,129,0.1);
+      color: var(--green); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    }
+
+    .actions { text-align: center; margin-bottom: 40px; }
+    .btn-diff {
+      background: var(--green); color: #000; padding: 14px 40px; border-radius: 8px;
+      border: none; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-diff:hover { background: var(--green-dark); }
+    .btn-diff:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .results { display: none; }
+    .results.visible { display: block; }
+    .results h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    .results-meta { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .results-meta strong { color: var(--red); }
+
+    .diff-modes {
+      display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .mode-btn {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px 16px; color: var(--text-muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .mode-btn.active { border-color: var(--green); color: var(--green); }
+
+    .diff-canvas-wrap {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; overflow: auto; text-align: center;
+    }
+    .diff-canvas-wrap canvas { max-width: 100%; border-radius: 8px; }
+
+    .cta-banner {
+      margin-top: 60px; padding: 40px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; text-align: center;
+    }
+    .cta-banner h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .cta-banner p { color: var(--text-muted); font-size: 16px; margin-bottom: 20px; }
+    .cta-banner a {
+      display: inline-block; background: var(--green); color: #000; padding: 12px 32px;
+      border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 15px;
+    }
+
+    .seo-content { padding: 60px 0; border-top: 1px solid var(--border); }
+    .seo-content h2 { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+    .seo-content p, .seo-content li { color: var(--text-muted); font-size: 15px; margin-bottom: 12px; }
+    .seo-content ul { padding-left: 20px; }
+
+    footer {
+      padding: 40px 0; border-top: 1px solid var(--border); text-align: center;
+      color: var(--text-dim); font-size: 13px;
+    }
+    footer a { color: var(--green); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="../../" class="logo">diff<span>goblin</span></a>
+    <div style="display:flex;gap:20px;align-items:center;">
+      <a href="../../" style="color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;">Home</a>
+      <a href="../../#waitlist" class="nav-cta">Get Early Access</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Free tool — no signup required</div>
+    <h1>Compare two <em>screenshots</em> instantly</h1>
+    <p>Upload a "before" and "after" image. See exactly what changed, pixel by pixel. Runs entirely in your browser.</p>
+  </div>
+</section>
+
+<section class="tool-area">
+  <div class="container">
+    <div class="drop-zones">
+      <div class="drop-zone" id="zone-before">
+        <span class="label-tag">Before</span>
+        <h3>Drop "before" image</h3>
+        <p>or click to browse (PNG, JPG, WebP)</p>
+        <input type="file" accept="image/*" id="input-before">
+      </div>
+      <div class="drop-zone" id="zone-after">
+        <span class="label-tag">After</span>
+        <h3>Drop "after" image</h3>
+        <p>or click to browse (PNG, JPG, WebP)</p>
+        <input type="file" accept="image/*" id="input-after">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-diff" id="btn-diff" disabled>Compare Images</button>
+    </div>
+
+    <div class="results" id="results">
+      <h2>Diff Results</h2>
+      <p class="results-meta" id="results-meta"></p>
+      <div class="diff-modes">
+        <button class="mode-btn active" data-mode="highlight">Highlight changes</button>
+        <button class="mode-btn" data-mode="sidebyside">Side by side</button>
+        <button class="mode-btn" data-mode="diff-only">Diff only</button>
+      </div>
+      <div class="diff-canvas-wrap">
+        <canvas id="diff-canvas"></canvas>
+      </div>
+
+      <div class="cta-banner">
+        <h3>Want this automated?</h3>
+        <p>DiffGoblin monitors any webpage daily and sends you a visual diff + AI summary when something changes. No manual screenshots needed.</p>
+        <a href="../../#waitlist">Get Early Access — Free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="seo-content">
+  <div class="container">
+    <h2>How this screenshot diff tool works</h2>
+    <p>This tool compares two images pixel by pixel using your browser's Canvas API. Nothing is uploaded to any server — your images stay on your machine.</p>
+    <ul>
+      <li><strong>Highlight mode</strong> overlays changed pixels in red on the original image</li>
+      <li><strong>Side by side</strong> shows both images next to each other for manual comparison</li>
+      <li><strong>Diff only</strong> shows just the changed pixels on a dark background</li>
+    </ul>
+    <p>Common uses: comparing website screenshots before and after a deploy, checking UI regressions, verifying design changes, auditing competitor page updates.</p>
+    <h2>Need automated monitoring?</h2>
+    <p>This tool is great for one-off comparisons. If you need daily automated screenshots and diffs of any webpage — competitor pricing, product pages, legal terms — <a href="../../#waitlist" style="color:var(--green);">try DiffGoblin</a>. We screenshot pages daily and email you a visual diff with an AI summary whenever something changes.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Free tool by <a href="../../">DiffGoblin</a> — a ShipGoblin experiment</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  const zoneBefore = document.getElementById('zone-before');
+  const zoneAfter = document.getElementById('zone-after');
+  const inputBefore = document.getElementById('input-before');
+  const inputAfter = document.getElementById('input-after');
+  const btnDiff = document.getElementById('btn-diff');
+  const results = document.getElementById('results');
+  const resultsMeta = document.getElementById('results-meta');
+  const canvas = document.getElementById('diff-canvas');
+  const ctx = canvas.getContext('2d');
+
+  let imgBefore = null;
+  let imgAfter = null;
+  let currentMode = 'highlight';
+
+  function setupZone(zone, input, label, cb) {
+    zone.addEventListener('click', () => input.click());
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0], zone, label, cb);
+    });
+    input.addEventListener('change', () => {
+      if (input.files.length) loadFile(input.files[0], zone, label, cb);
+    });
+  }
+
+  function loadFile(file, zone, label, cb) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        zone.innerHTML = '<span class="label-tag">' + label + '</span>';
+        const preview = document.createElement('img');
+        preview.src = e.target.result;
+        zone.appendChild(preview);
+        zone.classList.add('has-image');
+        cb(img);
+        checkReady();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function checkReady() {
+    btnDiff.disabled = !(imgBefore && imgAfter);
+  }
+
+  setupZone(zoneBefore, inputBefore, 'Before', img => { imgBefore = img; });
+  setupZone(zoneAfter, inputAfter, 'After', img => { imgAfter = img; });
+
+  btnDiff.addEventListener('click', () => {
+    if (!imgBefore || !imgAfter) return;
+    computeDiff();
+    results.classList.add('visible');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentMode = btn.dataset.mode;
+      computeDiff();
+    });
+  });
+
+  function computeDiff() {
+    const w = Math.max(imgBefore.width, imgAfter.width);
+    const h = Math.max(imgBefore.height, imgAfter.height);
+
+    // Draw before
+    const cBefore = document.createElement('canvas');
+    cBefore.width = w; cBefore.height = h;
+    const ctxB = cBefore.getContext('2d');
+    ctxB.drawImage(imgBefore, 0, 0);
+    const dataBefore = ctxB.getImageData(0, 0, w, h);
+
+    // Draw after
+    const cAfter = document.createElement('canvas');
+    cAfter.width = w; cAfter.height = h;
+    const ctxA = cAfter.getContext('2d');
+    ctxA.drawImage(imgAfter, 0, 0);
+    const dataAfter = ctxA.getImageData(0, 0, w, h);
+
+    // Compute diff
+    const pxB = dataBefore.data;
+    const pxA = dataAfter.data;
+    let diffCount = 0;
+    const totalPx = w * h;
+    const threshold = 30; // color distance threshold
+
+    if (currentMode === 'sidebyside') {
+      canvas.width = w * 2 + 4;
+      canvas.height = h;
+      ctx.fillStyle = '#262626';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(imgBefore, 0, 0);
+      ctx.drawImage(imgAfter, w + 4, 0);
+      // Count diff for stats
+      for (let i = 0; i < pxB.length; i += 4) {
+        const dr = pxB[i] - pxA[i];
+        const dg = pxB[i+1] - pxA[i+1];
+        const db = pxB[i+2] - pxA[i+2];
+        if (Math.sqrt(dr*dr + dg*dg + db*db) > threshold) diffCount++;
+      }
+    } else {
+      canvas.width = w;
+      canvas.height = h;
+
+      if (currentMode === 'highlight') {
+        ctx.drawImage(imgAfter, 0, 0);
+      } else {
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      const output = ctx.getImageData(0, 0, w, h);
+      const pxOut = output.data;
+
+      for (let i = 0; i < pxB.length; i += 4) {
+        const dr = pxB[i] - pxA[i];
+        const dg = pxB[i+1] - pxA[i+1];
+        const db = pxB[i+2] - pxA[i+2];
+        const dist = Math.sqrt(dr*dr + dg*dg + db*db);
+
+        if (dist > threshold) {
+          diffCount++;
+          if (currentMode === 'highlight') {
+            pxOut[i] = 239;     // red
+            pxOut[i+1] = 68;
+            pxOut[i+2] = 68;
+            pxOut[i+3] = 200;
+          } else {
+            // diff-only: show the after pixel at full brightness
+            pxOut[i] = pxA[i];
+            pxOut[i+1] = pxA[i+1];
+            pxOut[i+2] = pxA[i+2];
+            pxOut[i+3] = 255;
+          }
+        } else if (currentMode === 'diff-only') {
+          pxOut[i] = 10;
+          pxOut[i+1] = 10;
+          pxOut[i+2] = 10;
+          pxOut[i+3] = 255;
+        }
+      }
+      ctx.putImageData(output, 0, 0);
+    }
+
+    const pct = ((diffCount / totalPx) * 100).toFixed(1);
+    resultsMeta.innerHTML = '<strong>' + diffCount.toLocaleString() + ' pixels changed</strong> (' + pct + '% of image) across ' + w + 'x' + h + ' canvas';
+  }
+})();
+</script>
+
+</body>
+</html>
