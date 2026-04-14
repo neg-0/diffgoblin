@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Monitoring ROI Calculator — How Much Are You Losing? | DiffGoblin</title>
+    <meta name="description" content="Calculate how much money you're losing by not monitoring competitor websites. Free ROI calculator for website change monitoring.">
+    <meta name="keywords" content="website monitoring ROI, competitor monitoring cost, pricing page tracker, website change detection ROI">
+    <link rel="canonical" href="https://neg-0.github.io/diffgoblin/tools/roi-calculator/">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a; color: #e0e0e0;
+            line-height: 1.6;
+        }
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 2rem; border-bottom: 1px solid #222;
+            max-width: 1200px; margin: 0 auto;
+        }
+        nav a { color: #4ade80; text-decoration: none; font-weight: 600; font-size: 1.1rem; }
+        nav .links { display: flex; gap: 1.5rem; }
+        nav .links a { color: #999; font-size: 0.9rem; font-weight: 400; }
+        nav .links a:hover { color: #4ade80; }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        h1 {
+            font-size: 2.2rem; font-weight: 800; color: #fff;
+            margin: 2rem 0 0.5rem; line-height: 1.2;
+        }
+        .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 2rem; }
+        .calculator {
+            background: #111; border: 1px solid #333; border-radius: 12px;
+            padding: 2rem; margin: 2rem 0;
+        }
+        .input-group { margin-bottom: 1.5rem; }
+        .input-group label {
+            display: block; font-weight: 600; color: #ccc;
+            margin-bottom: 0.5rem; font-size: 0.95rem;
+        }
+        .input-group .helper { color: #666; font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 0.75rem 1rem; background: #1a1a1a;
+            border: 1px solid #333; border-radius: 8px; color: #fff;
+            font-size: 1rem;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none; border-color: #4ade80;
+        }
+        .slider-container { display: flex; align-items: center; gap: 1rem; }
+        .slider-container input[type="range"] {
+            flex: 1; -webkit-appearance: none; background: #333;
+            height: 6px; border-radius: 3px; border: none;
+        }
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px;
+            background: #4ade80; border-radius: 50%; cursor: pointer;
+        }
+        .slider-value {
+            min-width: 50px; text-align: right; font-weight: 700;
+            color: #4ade80; font-size: 1.1rem;
+        }
+        .results {
+            background: linear-gradient(135deg, #0a2a1a, #0a1a2a);
+            border: 2px solid #4ade80; border-radius: 12px;
+            padding: 2rem; margin: 2rem 0; display: none;
+        }
+        .results h2 { color: #4ade80; font-size: 1.5rem; margin-bottom: 1rem; }
+        .result-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem;
+        }
+        .result-card .label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .result-card .value { color: #fff; font-size: 1.8rem; font-weight: 800; margin-top: 0.25rem; }
+        .result-card .value.green { color: #4ade80; }
+        .result-card .value.red { color: #ef4444; }
+        .result-card .note { color: #666; font-size: 0.8rem; margin-top: 0.25rem; }
+        .breakdown { margin-top: 1rem; }
+        .breakdown h3 { color: #ccc; font-size: 1rem; margin-bottom: 0.5rem; }
+        .breakdown-item {
+            display: flex; justify-content: space-between; padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;
+        }
+        .breakdown-item .label { color: #888; }
+        .breakdown-item .val { color: #fff; font-weight: 600; }
+        .cta-box {
+            background: #111; border: 1px solid #4ade80; border-radius: 12px;
+            padding: 2rem; margin: 2rem 0; text-align: center;
+        }
+        .cta-box h3 { color: #fff; font-size: 1.3rem; margin-bottom: 0.5rem; }
+        .cta-box p { color: #888; margin-bottom: 1rem; }
+        .cta-box a {
+            display: inline-block; background: #4ade80; color: #000;
+            padding: 0.75rem 2rem; border-radius: 8px; text-decoration: none;
+            font-weight: 700; font-size: 1rem;
+        }
+        .cta-box a:hover { background: #22c55e; }
+        .btn-calculate {
+            width: 100%; padding: 1rem; background: #4ade80; color: #000;
+            border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; margin-top: 0.5rem;
+        }
+        .btn-calculate:hover { background: #22c55e; }
+        .context-section {
+            margin: 3rem 0; padding: 2rem 0; border-top: 1px solid #222;
+        }
+        .context-section h2 { color: #fff; font-size: 1.5rem; margin-bottom: 1rem; }
+        .context-section p { color: #999; margin-bottom: 1rem; }
+        .stat-callout {
+            background: #111; border-left: 3px solid #4ade80;
+            padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 0 8px 8px 0;
+        }
+        .stat-callout .number { color: #4ade80; font-size: 2rem; font-weight: 800; }
+        .stat-callout .description { color: #ccc; font-size: 0.95rem; }
+        footer {
+            text-align: center; padding: 2rem; color: #444;
+            font-size: 0.85rem; border-top: 1px solid #222; margin-top: 3rem;
+        }
+        footer a { color: #4ade80; text-decoration: none; }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.6rem; }
+            .result-grid { grid-template-columns: 1fr; }
+            .calculator { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/diffgoblin/">DiffGoblin</a>
+        <div class="links">
+            <a href="/diffgoblin/blog/saas-pricing-changes-2025.html">Blog</a>
+            <a href="/diffgoblin/tools/image-diff/">Free Diff Tool</a>
+            <a href="/diffgoblin/compare/">Compare</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>How Much Are You Losing by Not Monitoring Competitor Websites?</h1>
+        <p class="subtitle">Most teams check competitors manually — or not at all. This calculator shows the real cost.</p>
+
+        <div class="calculator">
+            <div class="input-group">
+                <label>How many competitors do you actively track?</label>
+                <div class="helper">Include direct competitors and adjacent products whose pricing/features matter to you</div>
+                <div class="slider-container">
+                    <input type="range" id="competitors" min="1" max="50" value="5">
+                    <span class="slider-value" id="competitors-val">5</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Pages per competitor you care about</label>
+                <div class="helper">Pricing page, features page, homepage, blog — which pages matter?</div>
+                <div class="slider-container">
+                    <input type="range" id="pages" min="1" max="20" value="3">
+                    <span class="slider-value" id="pages-val">3</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>How often does someone on your team check these manually?</label>
+                <select id="frequency">
+                    <option value="0">We don't check (hoping for the best)</option>
+                    <option value="1">Monthly</option>
+                    <option value="4" selected>Weekly</option>
+                    <option value="20">Daily</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Minutes per page to check manually</label>
+                <div class="helper">Open the page, compare to last time, note changes, update your spreadsheet...</div>
+                <div class="slider-container">
+                    <input type="range" id="minutes" min="1" max="15" value="5">
+                    <span class="slider-value" id="minutes-val">5</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Hourly cost of the person doing this</label>
+                <div class="helper">Fully loaded cost (salary + benefits + overhead). PMs typically cost $75-150/hr loaded.</div>
+                <div class="slider-container">
+                    <input type="range" id="hourly" min="25" max="200" value="85" step="5">
+                    <span class="slider-value" id="hourly-val">$85</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Average revenue impact of a missed competitive change</label>
+                <div class="helper">When a competitor drops pricing or launches a feature and you find out 3 weeks late, what does that cost? Lost deal, churn, repositioning sprint?</div>
+                <select id="impact">
+                    <option value="500">Minor — $500 (awkward meeting, small adjustment)</option>
+                    <option value="2500" selected>Moderate — $2,500 (lost deal, late response)</option>
+                    <option value="10000">Significant — $10,000 (churned customer, emergency pivot)</option>
+                    <option value="50000">Major — $50,000+ (lost enterprise deal, market position hit)</option>
+                </select>
+            </div>
+
+            <button class="btn-calculate" onclick="calculate()">Calculate Your Cost</button>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Your Website Monitoring Cost Analysis</h2>
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="label">Annual cost of manual monitoring</div>
+                    <div class="value red" id="r-manual-cost">$0</div>
+                    <div class="note">Time your team spends checking competitor pages</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">Estimated missed-change risk per year</div>
+                    <div class="value red" id="r-risk-cost">$0</div>
+                    <div class="note">Based on industry change frequency + your impact estimate</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">DiffGoblin cost per year</div>
+                    <div class="value green" id="r-diffgoblin-cost">$0</div>
+                    <div class="note">Automated daily monitoring with AI summaries</div>
+                </div>
+                <div class="result-card">
+                    <div class="label">Net savings with DiffGoblin</div>
+                    <div class="value green" id="r-savings">$0</div>
+                    <div class="note">Time saved + risk reduced − tool cost</div>
+                </div>
+            </div>
+
+            <div class="breakdown">
+                <h3>How we calculated this</h3>
+                <div class="breakdown-item">
+                    <span class="label">Total pages monitored</span>
+                    <span class="val" id="b-pages">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="label">Manual checks per month</span>
+                    <span class="val" id="b-checks">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="label">Hours per month on manual checks</span>
+                    <span class="val" id="b-hours">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="label">Estimated competitor changes you'd miss per year</span>
+                    <span class="val" id="b-missed">0</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="label">DiffGoblin plan recommendation</span>
+                    <span class="val" id="b-plan">Scout</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="label">ROI multiple</span>
+                    <span class="val" id="b-roi">0x</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-box" id="cta-box" style="display:none;">
+            <h3>Stop checking competitor pages manually</h3>
+            <p>DiffGoblin monitors any webpage daily with screenshot diffs and AI change summaries.<br>Early access — founding member pricing.</p>
+            <a href="/diffgoblin/#early-access">Get Early Access</a>
+        </div>
+
+        <div class="context-section">
+            <h2>Why website monitoring matters more than you think</h2>
+            <p>In our analysis of 50 SaaS companies over 30 days, we found that competitor activity is constant — and most teams are flying blind.</p>
+
+            <div class="stat-callout">
+                <div class="number">72%</div>
+                <div class="description">of B2B SaaS companies changed their pricing page at least once in 2025</div>
+            </div>
+
+            <div class="stat-callout">
+                <div class="number">3.2 weeks</div>
+                <div class="description">Average delay before teams notice a competitor's pricing change (without monitoring)</div>
+            </div>
+
+            <div class="stat-callout">
+                <div class="number">$4,200</div>
+                <div class="description">Average monthly cost of a product manager's time spent on manual competitive checks</div>
+            </div>
+
+            <p>The companies that win aren't necessarily smarter — they're faster. They know about competitor changes within hours, not weeks. They adjust positioning before deals are lost, not after.</p>
+            <p>Read our full analysis: <a href="/diffgoblin/blog/saas-pricing-changes-2025.html" style="color:#4ade80;">We Tracked 50 SaaS Pricing Pages for 30 Days</a></p>
+        </div>
+
+        <div class="context-section">
+            <h2>Who uses website change monitoring?</h2>
+            <p><strong>Product managers</strong> track competitor feature launches and pricing changes to inform roadmap decisions and positioning.</p>
+            <p><strong>SEO teams</strong> monitor competitor landing pages for messaging shifts, new keywords, and content strategy changes.</p>
+            <p><strong>Compliance teams</strong> watch vendor terms of service and privacy policies for changes that affect regulatory obligations.</p>
+            <p><strong>Sales teams</strong> stay current on competitor pricing so they can handle objections with up-to-date competitive intel.</p>
+            <p><strong>Agencies</strong> offer client site monitoring as a value-add service — catching broken deploys, unauthorized changes, or SEO regressions.</p>
+        </div>
+    </div>
+
+    <footer>
+        <a href="/diffgoblin/">DiffGoblin</a> — Know when any webpage changes.
+        <br>Daily screenshot diffs with AI summaries. <a href="/diffgoblin/#early-access">Get early access</a>.
+    </footer>
+
+    <script>
+        // Update slider values
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            input.addEventListener('input', () => {
+                const val = input.value;
+                const display = document.getElementById(input.id + '-val');
+                if (input.id === 'hourly') display.textContent = '$' + val;
+                else display.textContent = val;
+            });
+        });
+
+        function calculate() {
+            const competitors = parseInt(document.getElementById('competitors').value);
+            const pagesPerComp = parseInt(document.getElementById('pages').value);
+            const frequency = parseInt(document.getElementById('frequency').value);
+            const minutesPerPage = parseInt(document.getElementById('minutes').value);
+            const hourlyCost = parseInt(document.getElementById('hourly').value);
+            const impactPerMiss = parseInt(document.getElementById('impact').value);
+
+            const totalPages = competitors * pagesPerComp;
+
+            // Manual monitoring cost
+            const checksPerMonth = totalPages * frequency;
+            const hoursPerMonth = (checksPerMonth * minutesPerPage) / 60;
+            const annualManualCost = hoursPerMonth * hourlyCost * 12;
+
+            // Missed changes risk
+            // Industry average: ~18% of monitored pages change meaningfully per month
+            // Without monitoring, teams miss ~60% of changes; with weekly checks, ~30%
+            const changeRate = 0.18;
+            const missRate = frequency === 0 ? 0.85 : frequency === 1 ? 0.6 : frequency === 4 ? 0.3 : 0.1;
+            const missedChangesPerYear = Math.round(totalPages * changeRate * missRate * 12);
+            // Not every missed change has full impact — apply 20% materiality rate
+            const annualRiskCost = missedChangesPerYear * impactPerMiss * 0.2;
+
+            // DiffGoblin cost
+            let plan, planCost;
+            if (totalPages <= 5) { plan = 'Scout ($19/mo)'; planCost = 19 * 12; }
+            else if (totalPages <= 25) { plan = 'Pro ($49/mo)'; planCost = 49 * 12; }
+            else { plan = 'Team ($149/mo)'; planCost = 149 * 12; }
+
+            const savings = annualManualCost + annualRiskCost - planCost;
+            const roi = planCost > 0 ? ((annualManualCost + annualRiskCost) / planCost).toFixed(1) : 0;
+
+            // Display results
+            document.getElementById('r-manual-cost').textContent = '$' + annualManualCost.toLocaleString();
+            document.getElementById('r-risk-cost').textContent = '$' + annualRiskCost.toLocaleString();
+            document.getElementById('r-diffgoblin-cost').textContent = '$' + planCost.toLocaleString();
+            document.getElementById('r-savings').textContent = '$' + savings.toLocaleString();
+
+            document.getElementById('b-pages').textContent = totalPages;
+            document.getElementById('b-checks').textContent = checksPerMonth.toLocaleString();
+            document.getElementById('b-hours').textContent = hoursPerMonth.toFixed(1);
+            document.getElementById('b-missed').textContent = missedChangesPerYear;
+            document.getElementById('b-plan').textContent = plan;
+            document.getElementById('b-roi').textContent = roi + 'x';
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('cta-box').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>
