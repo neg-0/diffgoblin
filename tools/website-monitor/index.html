@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Website Change Monitor — Get Alerts When Any Page Changes | DiffGoblin</title>
+  <meta name="description" content="Monitor any webpage for changes. Get email alerts with visual diffs when competitor pricing, product pages, or legal terms update. Free tier available.">
+  <meta name="keywords" content="website change monitor, webpage monitoring, website change detection, monitor competitor website, website change alert, free website monitor">
+  <link rel="canonical" href="https://neg-0.github.io/diffgoblin/tools/website-monitor/">
+  <meta property="og:title" content="Free Website Change Monitor — DiffGoblin">
+  <meta property="og:description" content="Get email alerts when any webpage changes. Visual diffs + AI summaries. Monitor competitor pricing, product pages, legal terms.">
+  <meta property="og:type" content="website">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "DiffGoblin Website Change Monitor",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Free tier: monitor 1 URL daily"
+    },
+    "description": "Monitor any webpage for changes. Get visual diffs and email alerts when competitor pricing, product pages, or terms update."
+  }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green: #10b981; --green-dark: #059669; --bg: #0a0a0a;
+      --surface: #141414; --border: #262626; --text: #fafafa;
+      --text-muted: #a3a3a3; --text-dim: #737373; --red: #ef4444;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+    nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; justify-content: space-between; align-items: center; max-width: 1100px; }
+    .logo { font-size: 20px; font-weight: 700; color: var(--green); text-decoration: none; }
+    .logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .nav-cta {
+      background: var(--green); color: #000 !important; padding: 8px 20px; border-radius: 6px;
+      text-decoration: none; font-weight: 600; font-size: 14px;
+    }
+
+    .hero { padding: 80px 0 40px; text-align: center; }
+    .hero-badge {
+      display: inline-block; background: rgba(16,185,129,0.1); color: var(--green);
+      padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 600;
+      margin-bottom: 20px; border: 1px solid rgba(16,185,129,0.2);
+    }
+    h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 800; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.02em; }
+    h1 em { font-style: normal; color: var(--green); }
+    .hero p { font-size: 18px; color: var(--text-muted); max-width: 560px; margin: 0 auto 32px; }
+
+    .monitor-form {
+      max-width: 500px; margin: 0 auto; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; padding: 32px;
+    }
+    .monitor-form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .monitor-form input {
+      width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 15px; margin-bottom: 16px;
+    }
+    .monitor-form input:focus { outline: none; border-color: var(--green); }
+    .monitor-form input::placeholder { color: var(--text-dim); }
+    .monitor-form button {
+      width: 100%; padding: 14px; background: var(--green); color: #000; border: none;
+      border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .monitor-form button:hover { background: var(--green-dark); }
+    .form-note { text-align: center; font-size: 12px; color: var(--text-dim); margin-top: 12px; }
+    .form-success {
+      display: none; text-align: center; padding: 20px;
+    }
+    .form-success h3 { color: var(--green); margin-bottom: 8px; }
+
+    .use-cases { padding: 60px 0; }
+    .use-cases h2 { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 40px; }
+    .use-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 640px) { .use-grid { grid-template-columns: 1fr; } }
+    .use-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px;
+    }
+    .use-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .use-card p { font-size: 14px; color: var(--text-muted); }
+    .use-emoji { font-size: 28px; margin-bottom: 12px; }
+
+    .how-it-works { padding: 60px 0; border-top: 1px solid var(--border); }
+    .how-it-works h2 { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 40px; }
+    .steps { display: flex; flex-direction: column; gap: 24px; }
+    .step { display: flex; gap: 16px; align-items: flex-start; }
+    .step-num {
+      flex-shrink: 0; width: 36px; height: 36px; background: rgba(16,185,129,0.1);
+      color: var(--green); border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: 14px;
+    }
+    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .step p { font-size: 14px; color: var(--text-muted); }
+
+    .faq { padding: 60px 0; border-top: 1px solid var(--border); }
+    .faq h2 { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 40px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q { font-size: 16px; font-weight: 700; cursor: pointer; }
+    .faq-a { font-size: 14px; color: var(--text-muted); margin-top: 8px; display: none; }
+    .faq-item.open .faq-a { display: block; }
+
+    .cta-bottom {
+      padding: 60px 0; text-align: center; border-top: 1px solid var(--border);
+    }
+    .cta-bottom h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+    .cta-bottom p { font-size: 16px; color: var(--text-muted); margin-bottom: 24px; }
+    .cta-bottom a {
+      display: inline-block; background: var(--green); color: #000; padding: 14px 36px;
+      border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px;
+    }
+
+    footer {
+      padding: 40px 0; border-top: 1px solid var(--border); text-align: center;
+      color: var(--text-dim); font-size: 13px;
+    }
+    footer a { color: var(--green); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container" style="max-width:1100px;">
+    <a href="../../" class="logo">diff<span>goblin</span></a>
+    <div class="nav-links">
+      <a href="../image-diff/">Free Diff Tool</a>
+      <a href="../../blog/saas-pricing-changes-2025.html">Blog</a>
+      <a href="../../#waitlist" class="nav-cta">Get Early Access</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Free monitoring — 1 URL, no credit card</div>
+    <h1>Know when <em>any website</em> changes</h1>
+    <p>Enter a URL. We'll screenshot it daily, compare it to yesterday, and email you when something changes. Visual diff + plain-English summary.</p>
+
+    <div class="monitor-form" id="signup-form">
+      <label for="url">URL to monitor</label>
+      <input type="url" id="url" name="url" placeholder="https://competitor.com/pricing" required>
+      <label for="email">Your email</label>
+      <input type="email" id="email" name="email" placeholder="you@company.com" required>
+      <button type="submit" id="submit-btn">Start Monitoring — Free</button>
+      <p class="form-note">Free tier: 1 URL, daily checks, email alerts. No credit card.</p>
+    </div>
+
+    <div class="form-success" id="form-success">
+      <h3>You're on the list!</h3>
+      <p style="color:var(--text-muted);">We'll email you when your monitor is live. Usually within 24 hours.</p>
+    </div>
+  </div>
+</section>
+
+<section class="use-cases">
+  <div class="container">
+    <h2>What people monitor</h2>
+    <div class="use-grid">
+      <div class="use-card">
+        <div class="use-emoji">💰</div>
+        <h3>Competitor pricing pages</h3>
+        <p>Know the moment a competitor changes their pricing, adds a new tier, or adjusts feature gates. 72% of B2B SaaS companies changed pricing in 2025.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-emoji">📋</div>
+        <h3>Terms of service &amp; legal</h3>
+        <p>Compliance teams monitor terms, privacy policies, and regulatory pages. Get alerted to changes before they affect your agreements.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-emoji">🛍️</div>
+        <h3>Product &amp; feature pages</h3>
+        <p>Track when competitors launch features, update product descriptions, or change positioning. Stay ahead without checking manually.</p>
+      </div>
+      <div class="use-card">
+        <div class="use-emoji">📊</div>
+        <h3>Job boards &amp; org charts</h3>
+        <p>Monitor competitor hiring pages to understand where they're investing. New "AI Engineer" listings tell you more than any press release.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="container">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h3>Give us a URL</h3>
+          <p>Any public webpage. Pricing page, product page, legal terms, job board — anything you'd normally check by hand.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h3>We screenshot it daily</h3>
+          <p>Every 24 hours, we capture a full-page screenshot and compare it to the previous version using pixel-level visual diffing.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h3>You get an email when it changes</h3>
+          <p>Visual diff highlighting exactly what changed, plus a plain-English AI summary: "Pricing for Pro tier increased from $49 to $59/mo."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="container">
+    <h2>Frequently asked questions</h2>
+    <div class="faq-item">
+      <div class="faq-q">Is there really a free tier?</div>
+      <div class="faq-a">Yes. Monitor 1 URL with daily checks and email alerts. No credit card, no trial period, no catch. We want you to see the value before you pay for more URLs.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How is this different from Visualping or ChangeTower?</div>
+      <div class="faq-a">DiffGoblin focuses on visual diffs (screenshot-based), not HTML diffs. This means we catch changes that text-based monitors miss: layout shifts, image swaps, design changes, and dynamic content. We also include AI-powered change summaries so you don't have to squint at a diff image.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What kind of pages can I monitor?</div>
+      <div class="faq-a">Any publicly accessible webpage. Pricing pages, product pages, terms of service, job boards, landing pages, regulatory filings — if it has a URL and loads in a browser, we can monitor it.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How quickly will I get alerts?</div>
+      <div class="faq-a">We check monitored URLs once every 24 hours. When a change is detected, you'll receive an email within minutes. Paid plans include more frequent checks (every 6 hours or hourly).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I monitor pages behind a login?</div>
+      <div class="faq-a">Not yet. We're working on authenticated monitoring for paid plans. For now, we support any publicly accessible URL.</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-bottom">
+  <div class="container">
+    <h2>Stop checking websites manually</h2>
+    <p>One URL, monitored daily, free forever. See what you've been missing.</p>
+    <a href="#" onclick="document.getElementById('url').focus();window.scrollTo({top:0,behavior:'smooth'});return false;">Start Monitoring — Free</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><a href="../../">DiffGoblin</a> · <a href="../image-diff/">Free Diff Tool</a> · <a href="../roi-calculator/">ROI Calculator</a> · <a href="../../blog/saas-pricing-changes-2025.html">Blog</a></p>
+    <p style="margin-top:8px;">Built by <a href="../../">DiffGoblin</a> — a ShipGoblin experiment</p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  // FAQ toggles
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      item.classList.toggle('open');
+    });
+  });
+
+  // Form submission
+  const form = document.getElementById('signup-form');
+  const btn = document.getElementById('submit-btn');
+  const success = document.getElementById('form-success');
+
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const url = document.getElementById('url').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if (!url || !email) return;
+    if (!email.includes('@')) return;
+
+    // Store locally
+    const signups = JSON.parse(localStorage.getItem('dg_monitor_signups') || '[]');
+    signups.push({ url, email, ts: new Date().toISOString() });
+    localStorage.setItem('dg_monitor_signups', JSON.stringify(signups));
+
+    // Try formsubmit
+    fetch('https://formsubmit.co/ajax/dustin@shipgoblin.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: url,
+        email: email,
+        source: 'website-monitor-tool',
+        _subject: 'DiffGoblin Monitor Signup: ' + url
+      })
+    }).catch(() => {});
+
+    form.style.display = 'none';
+    success.style.display = 'block';
+  });
+})();
+</script>
+
+</body>
+</html>
